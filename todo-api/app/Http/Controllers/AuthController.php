@@ -14,9 +14,9 @@ class AuthController extends Controller
     {
         // Validation des champs
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:6'
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required'
         ]);
 
         // Création de l'utilisateur
@@ -27,9 +27,12 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         // Retourne l'utilisateur créé avec un token
         return response()->json([
             'user' => $user,
+            'access_token' => $token,
             'message' => 'Inscription réussie',
         ]);
     }
@@ -50,6 +53,7 @@ class AuthController extends Controller
 
         // Récupère l'utilisateur connecté
         $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         // Retourne un message de succès avec les infos
         return response()->json([
